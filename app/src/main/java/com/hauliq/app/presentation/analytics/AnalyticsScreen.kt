@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,13 +44,14 @@ fun AnalyticsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Analytics Center", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black) },
                 actions = {
-                    IconButton(onClick = { /* Export */ }) {
+                    IconButton(onClick = { viewModel.exportPdf(context) }) {
                         Icon(Icons.Default.IosShare, contentDescription = "Export")
                     }
                 }
@@ -103,7 +105,10 @@ fun AnalyticsScreen(
                     ActivityTimelineSection(uiState.recentActivities)
 
                     // 8. Export Options
-                    ExportSection()
+                    ExportSection(
+                        onExportPdf = { viewModel.exportPdf(context) },
+                        onExportCsv = { viewModel.exportCsv(context) }
+                    )
 
                     Spacer(modifier = Modifier.height(32.dp))
                 }
@@ -619,20 +624,28 @@ fun ActivityItem(title: String, desc: String, time: String, icon: ImageVector, c
 }
 
 @Composable
-fun ExportSection() {
+fun ExportSection(
+    onExportPdf: () -> Unit,
+    onExportCsv: () -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Reports & Export", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ExportButton("Export PDF", Icons.Default.PictureAsPdf, Modifier.weight(1f))
-            ExportButton("Export CSV", Icons.Default.TableChart, Modifier.weight(1f))
+            ExportButton("Export PDF", Icons.Default.PictureAsPdf, Modifier.weight(1f), onClick = onExportPdf)
+            ExportButton("Export CSV", Icons.Default.TableChart, Modifier.weight(1f), onClick = onExportCsv)
         }
     }
 }
 
 @Composable
-fun ExportButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
+fun ExportButton(
+    text: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     OutlinedButton(
-        onClick = { /* Export */ },
+        onClick = onClick,
         modifier = modifier.height(48.dp),
         shape = RoundedCornerShape(12.dp)
     ) {

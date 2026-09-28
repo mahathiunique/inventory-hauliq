@@ -26,6 +26,7 @@ data class AnalyticsUiState(
     val weeklyRevenue: Double = 0.0,
     val avgOrderValue: Double = 0.0,
     val lowStockProducts: List<Product> = emptyList(),
+    val allProducts: List<Product> = emptyList(),
     val recentActivities: List<Transaction> = emptyList(),
     val categoryDistribution: Map<String, Int> = emptyMap(),
     val orderStatusDistribution: Map<String, Int> = emptyMap(),
@@ -82,6 +83,7 @@ class AnalyticsViewModel @Inject constructor(
                     lowStockCount = lowStock.size,
                     outOfStockCount = outOfStock,
                     lowStockProducts = lowStock,
+                    allProducts = products,
                     recentActivities = transactions.take(10),
                     categoryDistribution = categoryDist,
                     orderStatusDistribution = statusDist.mapKeys { it.key.toString() },
@@ -96,5 +98,25 @@ class AnalyticsViewModel @Inject constructor(
 
     fun onFilterSelected(filter: TimeFilter) {
         _uiState.update { it.copy(selectedTimeFilter = filter) }
+    }
+
+    fun exportPdf(context: android.content.Context) {
+        val state = _uiState.value
+        com.hauliq.app.core.utils.ReportExporter.exportAndSharePdf(
+            context = context,
+            state = state,
+            products = state.allProducts,
+            transactions = state.recentActivities
+        )
+    }
+
+    fun exportCsv(context: android.content.Context) {
+        val state = _uiState.value
+        com.hauliq.app.core.utils.ReportExporter.exportAndShareCsv(
+            context = context,
+            state = state,
+            products = state.allProducts,
+            transactions = state.recentActivities
+        )
     }
 }

@@ -21,6 +21,7 @@ import com.hauliq.app.core.components.EmptyState
 import com.hauliq.app.core.components.LoadingScreen
 import com.hauliq.app.core.theme.LightPrimary
 import com.hauliq.app.core.utils.Formatters
+import androidx.compose.ui.platform.LocalContext
 import com.hauliq.app.domain.model.ReportItem
 import com.hauliq.app.domain.model.ReportType
 
@@ -32,6 +33,7 @@ fun ReportsScreen(
     val reports by viewModel.reports.collectAsState()
     val isExporting by viewModel.isExporting.collectAsState()
     val statusMessage by viewModel.exportStatusMessage.collectAsState()
+    val context = LocalContext.current
 
     var selectedReportType by remember { mutableStateOf(ReportType.INVENTORY) }
 
@@ -117,7 +119,7 @@ fun ReportsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
-                            onClick = { viewModel.exportReport(selectedReportType, "PDF") },
+                            onClick = { viewModel.exportReport(selectedReportType, "PDF", context) },
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .weight(1f)
@@ -132,7 +134,7 @@ fun ReportsScreen(
                         }
 
                         Button(
-                            onClick = { viewModel.exportReport(selectedReportType, "Excel") },
+                            onClick = { viewModel.exportReport(selectedReportType, "Excel", context) },
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .weight(1f)
@@ -176,7 +178,10 @@ fun ReportsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(reports) { report ->
-                        ReportRow(report = report)
+                        ReportRow(
+                            report = report,
+                            onDownloadClick = { viewModel.downloadExistingReport(report, context) }
+                        )
                     }
                 }
             }
@@ -240,7 +245,8 @@ fun ReportTab(
 @Composable
 fun ReportRow(
     report: ReportItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDownloadClick: () -> Unit = {}
 ) {
     val icon = if (report.fileFormat == "PDF") Icons.Default.PictureAsPdf else Icons.Default.Description
     val color = if (report.fileFormat == "PDF") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
@@ -276,7 +282,7 @@ fun ReportRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = onDownloadClick) {
                 Icon(imageVector = Icons.Default.Download, contentDescription = "Download Report", tint = MaterialTheme.colorScheme.primary)
             }
         }

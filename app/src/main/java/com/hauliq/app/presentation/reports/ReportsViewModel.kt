@@ -1,11 +1,14 @@
 package com.hauliq.app.presentation.reports
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hauliq.app.core.utils.ReportExporter
 import com.hauliq.app.domain.model.ReportItem
 import com.hauliq.app.domain.model.ReportType
 import com.hauliq.app.domain.repository.InventoryRepository
 import com.hauliq.app.domain.repository.TransactionRepository
+import com.hauliq.app.presentation.analytics.AnalyticsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -29,36 +32,55 @@ class ReportsViewModel @Inject constructor(
     val exportStatusMessage: StateFlow<String?> = _exportStatusMessage.asStateFlow()
 
     init {
-        // Load some initial history if desired, or leave empty
         _reports.value = listOf(
             ReportItem("R001", ReportType.INVENTORY, "End-of-Month Stock Valuations", System.currentTimeMillis() - 604800000, "PDF", "2.4 MB"),
             ReportItem("R002", ReportType.SALES, "Q2 Sales Performance Report", System.currentTimeMillis() - 1209600000, "Excel", "1.1 MB")
         )
     }
 
-    fun exportReport(type: ReportType, format: String) {
+    fun exportReport(type: ReportType, format: String, context: Context) {
         viewModelScope.launch {
             _isExporting.value = true
             
-            // Actually fetch some data to "simulate" a real report compilation
+            val products = inventoryRepository.getProducts().first()
+            val transactions = transactionRepository.getAllTransactions().first()
+
             val dataCount = when (type) {
-                ReportType.INVENTORY -> inventoryRepository.getProducts().first().size
-                else -> transactionRepository.getAllTransactions().first().size
+                ReportType.INVENTORY -> products.size
+                else -> transactions.size
             }
 
             _exportStatusMessage.value = "Analyzing $dataCount records..."
-            delay(1200)
+            delay(500)
             _exportStatusMessage.value = "Compiling tables..."
-            delay(1000)
+            delay(400)
             _exportStatusMessage.value = "Generating $format file..."
-            delay(800)
+
+            val totalValue = products.sumOf { it.price * it.quantity }
+            val lowStock = products.filter { it.quantity <= it.lowStockThreshold }
+            val outOfStock = products.count { it.quantity == 0 }
+
+            val dummyState = AnalyticsUiState(
+                totalInventoryCount = products.size,
+                totalInventoryValue = totalValue,
+                lowStockCount = lowStock.size,
+                outOfStockCount = outOfStock,
+                lowStockProducts = lowStock,
+                allProducts = products,
+                recentActivities = transactions.take(15)
+            )
+
+            if (format.equals("PDF", ignoreCase = true)) {
+                ReportExporter.exportAndSharePdf(context, dummyState, products, transactions)
+            } else {
+                ReportExporter.exportAndShareCsv(context, dummyState, products, transactions)
+            }
 
             val name = when (type) {
                 ReportType.INVENTORY -> "Inventory Audit Sheet"
                 ReportType.SALES -> "Sales Metrics Record"
                 ReportType.PURCHASE -> "Purchase Order Audit Log"
             }
-// ...
 
             val size = if (format == "PDF") "1.8 MB" else "784 KB"
             val newReport = ReportItem(
@@ -76,8 +98,33 @@ class ReportsViewModel @Inject constructor(
 
             _isExporting.value = false
             _exportStatusMessage.value = "Report exported successfully!"
-            delay(2000)
+            delay(1500)
             _exportStatusMessage.value = null
+        }
+    }
+
+    fun downloadExistingReport(report: ReportItem, context: Context) {
+        viewModelScope.launch {
+            val products = inventoryRepository.getProducts().first()
+            val transactions = transactionRepository.getAllTransactions().first()
+            val totalValue = products.sumOf { it.price * it.quantity }
+            val lowStock = products.filter { it.quantity <= it.lowStockThreshold }
+
+            val dummyState = AnalyticsUiState(
+                totalInventoryCount = products.size,
+                totalInventoryValue = totalValue,
+                lowStockCount = lowStock.size,
+                outOfStockCount = products.count { it.quantity == 0 },
+                lowStockProducts = lowStock,
+                allProducts = products,
+                recentActivities = transactions.take(15)
+            )
+
+            if (report.fileFormat.equals("PDF", ignoreCase = true)) {
+                ReportExporter.exportAndSharePdf(context, dummyState, products, transactions)
+            } else {
+                ReportExporter.exportAndShareCsv(context, dummyState, products, transactions)
+            }
         }
     }
 

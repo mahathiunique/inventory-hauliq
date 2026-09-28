@@ -2443,6 +2443,7 @@ com.hauliq.app:dimen/mtrl_badge_size = 0x7f060247
 com.hauliq.app:attr/flow_lastHorizontalBias = 0x7f0301e0
 com.hauliq.app:color/m3_sys_color_dark_surface_variant = 0x7f050183
 com.hauliq.app:dimen/m3_alert_dialog_elevation = 0x7f0600a0
+com.hauliq.app:xml/file_paths = 0x7f130002
 com.hauliq.app:layout/notification_template_custom_big = 0x7f0b0063
 com.hauliq.app:color/material_timepicker_button_background = 0x7f0502bc
 com.hauliq.app:drawable/mtrl_switch_thumb_checked_unchecked = 0x7f0700e0
