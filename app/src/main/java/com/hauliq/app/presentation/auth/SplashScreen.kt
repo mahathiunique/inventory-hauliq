@@ -1,0 +1,86 @@
+package com.hauliq.app.presentation.auth
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.hauliq.app.R
+import kotlinx.coroutines.delay
+
+@Composable
+fun SplashScreen(
+    onTimeout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scale = remember { Animatable(0.6f) }
+    val alpha = remember { Animatable(0f) }
+
+    LaunchedEffect(key1 = true) {
+        scale.animateTo(
+            targetValue = 1.0f,
+            animationSpec = tween(durationMillis = 1000)
+        )
+        alpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 1000)
+        )
+        delay(2000) // Delay before navigating
+        onTimeout()
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFF0F172A)), // Obsidian Dark Blue to match logo theme
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_hauliq_logo),
+                contentDescription = "HaulIQ Logo",
+                modifier = Modifier
+                    .size(180.dp)
+                    .scale(scale.value)
+                    .alpha(alpha.value)
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "HAULIQ",
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                letterSpacing = 8.sp,
+                modifier = Modifier.alpha(alpha.value)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Smart Warehouse & Inventory Management",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.alpha(alpha.value)
+            )
+        }
+    }
+}

@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="1024dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M0,0h1024v1024h-1024z" />
+
+    <!-- Stylized 'H' -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M380,300 C300,300 250,450 250,550 C250,650 300,750 400,750 C450,750 480,700 500,650 L520,650 C500,750 450,820 350,820 C220,820 150,680 150,550 C150,380 250,220 400,220 C480,220 530,280 530,350 C530,420 500,480 450,520 L380,300 Z" />
+
+    <!-- Stylized 'Q' overlapping -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M650,350 C750,350 820,450 820,550 C820,680 750,800 600,800 C500,800 450,720 450,650 C450,580 500,520 580,520 C650,520 700,580 700,650 C700,720 650,750 600,750 L600,770 C700,770 780,680 780,550 C780,450 720,380 650,380 C600,380 550,420 530,480 L510,480 C550,380 600,350 650,350 Z" />
+
+    <!-- Connection Stroke -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M480,500 L560,500 L560,520 L480,520 Z" />
+
+    <!-- HAUL IQ Text Simulation -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M350,880 h20 v40 h-20 z M390,880 h20 v40 h-20 z M430,880 h20 v40 h-20 z M470,880 h20 v40 h-20 z M550,880 h20 v40 h-20 z M590,880 h20 v40 h-20 z" />
+</vector>

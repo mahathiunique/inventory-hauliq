@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="firebase_database_url" translatable="false">https://hauliq-bcda2-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+    <string name="gcm_defaultSenderId" translatable="false">463252887619</string>
+    <string name="google_api_key" translatable="false">AIzaSyDewYJw3aMF15L5QzTOEtjbhbce1orlx18</string>
+    <string name="google_app_id" translatable="false">1:463252887619:android:0e8fb7238cb337642f9cf6</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDewYJw3aMF15L5QzTOEtjbhbce1orlx18</string>
+    <string name="google_storage_bucket" translatable="false">hauliq-bcda2.firebasestorage.app</string>
+    <string name="project_id" translatable="false">hauliq-bcda2</string>
+</resources>
